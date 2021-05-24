@@ -1,5 +1,87 @@
 
 
+/*------------------navigation menu---------------*/
+
+(() =>{
+
+    const hamburgerBtn = document.querySelector(".hamburger-btn"),
+    navMenu = document.querySelector(".nav-menu"),
+    closeNavBtn = navMenu.querySelector(".close-nav-menu"); 
+
+    hamburgerBtn.addEventListener("click", showNavMenu);
+    closeNavBtn.addEventListener("click", hideNavMenu);
+    
+    function showNavMenu(){
+        navMenu.classList.add("open");
+        bodyScrollingToggle();
+    }
+
+    function hideNavMenu(){
+        navMenu.classList.remove("open");
+        fadeOutEffect();
+        bodyScrollingToggle();
+    }
+
+    function fadeOutEffect(){
+        document.querySelector(".fade-out-effect").classList.add("active");
+        setTimeout(() =>{
+        document.querySelector(".fade-out-effect").classList.remove("active"); 
+        },300)
+    }
+
+    // attach an event handler to document
+    document.addEventListener("click", (event) =>{
+        if(event.target.classList.contains('link-item')){
+
+            /*make sure event.target.hash has a value before overridding default behaviour*/ 
+            if(event.target.hash !==""){
+
+                //prevent default anchor click behaviour
+                event.preventDefault();
+                const hash = event.target.hash;
+
+                // deactivate existing active 'section'
+                document.querySelector(".section.active").classList.add("hide");
+                document.querySelector(".section.active").classList.remove("active");
+
+                //activate new'section'
+                document.querySelector(hash).classList.add("active");
+                document.querySelector(hash).classList.remove("hide");
+
+                //deactivate existing active navigation menu'link-item'
+                navMenu.querySelector(".active").classList.add("outer-shadow","hover-in-shadow");
+                navMenu.querySelector(".active").classList.remove("active","inner-shadow");
+
+                /* if clicked 'link-item is contained within the navigation menu'*/
+                if(navMenu.classList.contains("open")){
+
+                    //activate new navigation menu'link-item'
+                    event.target.classList.add("active","inner-shadow");
+                    event.target.classList.remove("outer-shadow","hover-inner-shadow");
+
+                    //hide navigation menu
+                    hideNavMenu();
+                }
+                else{
+                    let navItems = navMenu.querySelectorAll(".link-item");
+                    navItems.forEach((item) =>{
+                        if(hash === item.hash){
+                            
+                            //activate new navigation menu 'link-item'
+                            item.classList.add("active","inner-shadow");
+                            item.classList.remove("outer-shadow","hover-inner-shadow");
+                        }
+                    })
+                    fadeOutEffect();
+
+                }
+            }
+        }
+        
+    })
+
+})();
+
 /*--------------Abount sectiom tabs ---------------*/
 
 (() =>{
@@ -7,16 +89,21 @@
     tabsContainer = document.querySelector(".about-tabs");
 
     tabsContainer.addEventListener("click", (event)=>{
+
         /* if event target contains 'tab-item' class and not contains 'active' class */
         if(event.target.classList.contains("tab-item") &&
         !event.target.classList.contains("active")){
             const target = event.target.getAttribute("data-target");
+
             //deactivate existing active 'tab-item'
             tabsContainer.querySelector(".active").classList.remove("outer-shadow","active");
+            
             //activate new 'tab-item'
             event.target.classList.add("active","outer-shadow");
+
             //deactivate new 'tab-content'
             aboutSection.querySelector(".tab-content.active").classList.remove("active");
+
             //activate new 'tab-content'
             aboutSection.querySelector(target).classList.add("active");
         }
@@ -46,8 +133,10 @@ function bodyScrollingToggle(){
     filterContainer.addEventListener("click", (event)=>{
         if(event.target.classList.contains("filter-item") &&
         !event.target.classList.contains("active")){
+
         // deactivate existing active 'filter-item'
         filterContainer.querySelector(".active").classList.remove("outer-shadow","active");
+
         // activate new 'filter-item'
         event.target.classList.add("active","outer-shadow");
         const target = event.target.getAttribute("data-target");
@@ -65,11 +154,15 @@ function bodyScrollingToggle(){
     })
 
     portfolioItemsContainer.addEventListener("click", (event) =>{
+        
         if(event.target.closest(".portfolio-item-inner")){
             const portfolioItem = event.target.closest(".portfolio-item-inner").parentElement;
+
             // get the portfolioItem index
             itemIndex = Array.from(portfolioItem.parentElement.children).indexOf(portfolioItem);
+
             screenshots = portfolioItems[itemIndex].querySelector(".portfolio-item-img img").getAttribute("data-screenshots");
+
             // convert screenshots into array
             screenshots = screenshots.split(",");
             if(screenshots.length === 1){
@@ -102,10 +195,12 @@ function bodyScrollingToggle(){
     function popupSlideshow(){
         const imgSrc = screenshots[slideIndex];
         const popupImg = popup.querySelector(".pp-img");
+
          /*activate loader until the popupImg loaded*/
         popup.querySelector(".pp-loader").classList.add("active");
         popupImg.src=imgSrc;
         popupImg.onload = () =>{
+
             // deactivate loader after the popImg loaded
             popup.querySelector(".pp-loader").classList.remove("active");
         }
@@ -141,16 +236,22 @@ function bodyScrollingToggle(){
             return;/* end function execution */
         }
         projectDetailsBtn.style.display="block";
+
         // get the project details
         const details = portfolioItems[itemIndex].querySelector(".portfolio-item-details").innerHTML;
+
         // set the project details
         popup.querySelector(".pp-project-details").innerHTML = details;
+
         // get the project title
         const title = portfolioItems[itemIndex].querySelector(".portfolio-item-title").innerHTML;
+
         // set the project title
         popup.querySelector(".pp-title h2").innerHTML = title;
+
         // get the project category
         const category = portfolioItems[itemIndex].getAttribute("data-category");
+
         // set the project category
         popup.querySelector(".pp-project-category").innerHTML = category.split("-").join(" ");
     }
@@ -224,10 +325,22 @@ function bodyScrollingToggle(){
     function slider(){
         // deactivate existing active slide
         sliderContainer.querySelector(".testi-item.active").classList.remove("active");
+
         // activate new slide
         slides[slideIndex].classList.add("active");
         sliderContainer.style.marginLeft = - (slideWidth * slideIndex) + "px";
     }
     slider();
 
+})();
+
+/*------------------------- hide all sections except active ------------------------ */
+(() =>{
+
+    const sections = document.querySelectorAll(".section");
+    sections.forEach((section) =>{
+        if(!section.classList.contains("active")){
+            section.classList.add("hide");
+        }
+    })
 })();
